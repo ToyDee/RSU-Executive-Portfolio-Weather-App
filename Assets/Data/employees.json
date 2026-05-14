@@ -1,0 +1,42 @@
+{
+  "1": {
+    "name": "Dr. Attawit Ourairat",
+    "position": "President",
+    "secretary": "Tudchadanan Krainara",
+    "phone": "66-2791-5922",
+    "fax": "66-2791-5931",
+    "email": "attawit@rsu.ac.th"
+  },
+  "2": {
+    "name": "Mr. Kasin Chanruang",
+    "position": "Vice President for Management",
+    "secretary": "Paweena Makeyok",
+    "phone": "66-2791-5923",
+    "fax": "66-2791-5931",
+    "email": "kasin@rsu.ac.th"
+  },
+  "3": {
+    "name": "Patamaporn Sukplang, Ph.D.",
+    "position": "Vice President for Academic Affairs",
+    "secretary": "Phansaporn Thamtan",
+    "phone": "66-2791-5556",
+    "fax": "66-2791-5565",
+    "email": "-"
+  },
+  "4": {
+    "name": "Asst.Prof.Dr. Narupol Chaiyot",
+    "position": "Vice President for Planning and Development",
+    "secretary": "-",
+    "phone": "-",
+    "fax": "-",
+    "email": "narupol@rsu.ac.th"
+  },
+  "5": {
+    "name": "Assoc.Prof.Dr. Grit Thonglert",
+    "position": "Vice President for Student Affairs",
+    "secretary": "Ms. Ratcha Satapornpong",
+    "phone": "02-997-2200, 3900",
+    "fax": "02-997-2200, 3909",
+    "email": "grit.t@rsu.ac.th"
+  }
+}

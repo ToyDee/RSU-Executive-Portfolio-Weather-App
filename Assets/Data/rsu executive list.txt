@@ -1,0 +1,17 @@
+https://www.rsu.ac.th/en/blog/655494cb68f67af53a2e0c4b
+
+Executive name
+    1: "Dr. Attawit Ourairat",
+    2: "Mr. Kasin Chanruang",
+    3: "Dr. Patamaporn Sukplang",
+    4: "Asst Prof. Dr. Narupol Chaiyat",
+    5: "Assoc Prof. Dr. Grit Thonglert",
+
+
+
+Executive position
+    1: "President",
+    2: "Vice President for Management",
+    3: "Vice President for Academic Affairs",
+    4: "Vice President for Planning and Development",
+    5: "Vice President for Student Affairs",
