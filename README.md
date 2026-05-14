@@ -1,16 +1,16 @@
-# finalassignment
+# RSU Executive Portfolio & Weather App
 
-A new Flutter project.
+A Flutter mobile app built for Rangsit University.
 
-## Getting Started
+## Features
+- 🔐 Login & Sign Up with local authentication
+- 👥 RSU Executive directory with search
+- 🌤️ Live weather for Bangkok (OpenWeatherMap API)
+- 💨 Air quality / AQI index with pollutant breakdown
+- 📱 Runs on Android, iOS, and Web
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Built With
+- Flutter 3 / Dart
+- OpenWeatherMap API
+- shared_preferences
+- http package
