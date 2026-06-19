@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'app_security.dart';
 import 'employees_page.dart';
 import 'signup_page.dart';
 
@@ -12,8 +13,8 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController _usernameController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
+  final _usernameController = TextEditingController();
+  final _passwordController = TextEditingController();
   bool _obscurePassword = true;
   bool _isLoading = false;
 
@@ -25,25 +26,28 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> _login() async {
-    // FIX: validate form before attempting login
     if (!_formKey.currentState!.validate()) return;
-
     setState(() => _isLoading = true);
 
     final prefs = await SharedPreferences.getInstance();
     final storedUsername = prefs.getString('username');
-    final storedPassword = prefs.getString('password');
+    final storedHash     = prefs.getString('password'); // "salt:hash", or legacy MD5
 
-    // FIX: trim whitespace to avoid confusing login failures
     final enteredUser = _usernameController.text.trim();
     final enteredPass = _passwordController.text;
 
-    await Future.delayed(const Duration(milliseconds: 400)); // natural feel
-
+    await Future.delayed(const Duration(milliseconds: 400));
     if (!mounted) return;
     setState(() => _isLoading = false);
 
-    if (enteredUser == storedUsername && enteredPass == storedPassword) {
+    final passwordMatch = AppSecurity.verifyPassword(enteredPass, storedHash ?? '');
+
+    if (enteredUser == storedUsername && passwordMatch) {
+
+      if (storedHash != null && AppSecurity.isLegacyHash(storedHash)) {
+        await prefs.setString('password', AppSecurity.hashPassword(enteredPass));
+      }
+
       Navigator.pushReplacement(
         context,
         PageRouteBuilder(
@@ -54,27 +58,23 @@ class _LoginPageState extends State<LoginPage> {
         ),
       );
     } else {
-      _showError('Invalid username or password. Please try again.');
+      _showError('Invalid username or password.');
       _passwordController.clear();
     }
   }
 
-  void _showError(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            const Icon(Icons.error_outline, color: Colors.white, size: 20),
-            const SizedBox(width: 10),
-            Expanded(child: Text(message)),
-          ],
-        ),
-        backgroundColor: Colors.red.shade700,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        margin: const EdgeInsets.all(16),
-      ),
-    );
+  void _showError(String msg) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Row(children: [
+        const Icon(Icons.error_outline, color: Colors.white, size: 20),
+        const SizedBox(width: 10),
+        Expanded(child: Text(msg)),
+      ]),
+      backgroundColor: Colors.red.shade700,
+      behavior: SnackBarBehavior.floating,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      margin: const EdgeInsets.all(16),
+    ));
   }
 
   @override
@@ -97,64 +97,43 @@ class _LoginPageState extends State<LoginPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    // Logo
                     Center(
                       child: Container(
-                        width: 110,
-                        height: 110,
+                        width: 110, height: 110,
                         decoration: BoxDecoration(
                           color: Colors.white,
                           shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: const Color(0xFF1B5E20).withOpacity(0.15),
-                              blurRadius: 20,
-                              offset: const Offset(0, 6),
-                            ),
-                          ],
+                          boxShadow: [BoxShadow(
+                            color: const Color(0xFF1B5E20).withOpacity(0.15),
+                            blurRadius: 20, offset: const Offset(0, 6),
+                          )],
                         ),
                         padding: const EdgeInsets.all(16),
                         child: Image.asset('Assets/Images/RSU_Logo.png'),
                       ),
                     ),
                     const SizedBox(height: 28),
-                    const Text(
-                      'Welcome Back',
+                    const Text('Welcome Back',
                       textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 26,
-                        fontWeight: FontWeight.w800,
-                        color: Color(0xFF1B5E20),
-                        letterSpacing: 0.5,
-                      ),
+                      style: TextStyle(fontSize: 26, fontWeight: FontWeight.w800,
+                          color: Color(0xFF1B5E20), letterSpacing: 0.5),
                     ),
                     const SizedBox(height: 6),
-                    Text(
-                      'Sign in to your RSU account',
+                    Text('Sign in to your RSU account',
                       textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey.shade600,
-                      ),
+                      style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
                     ),
                     const SizedBox(height: 36),
-
-                    // Username field
                     TextFormField(
                       controller: _usernameController,
                       textInputAction: TextInputAction.next,
                       decoration: const InputDecoration(
                         labelText: 'Username',
-                        prefixIcon: Icon(Icons.person_outline,
-                            color: Color(0xFF1B5E20)),
+                        prefixIcon: Icon(Icons.person_outline, color: Color(0xFF1B5E20)),
                       ),
-                      // FIX: added validation — field cannot be empty
-                      validator: (v) =>
-                      (v == null || v.trim().isEmpty) ? 'Username is required' : null,
+                      validator: (v) => (v == null || v.trim().isEmpty) ? 'Username is required' : null,
                     ),
                     const SizedBox(height: 16),
-
-                    // Password field
                     TextFormField(
                       controller: _passwordController,
                       obscureText: _obscurePassword,
@@ -162,64 +141,39 @@ class _LoginPageState extends State<LoginPage> {
                       onFieldSubmitted: (_) => _login(),
                       decoration: InputDecoration(
                         labelText: 'Password',
-                        prefixIcon: const Icon(Icons.lock_outline,
-                            color: Color(0xFF1B5E20)),
-                        // IMPROVEMENT: toggle password visibility
+                        prefixIcon: const Icon(Icons.lock_outline, color: Color(0xFF1B5E20)),
                         suffixIcon: IconButton(
-                          icon: Icon(
-                            _obscurePassword
-                                ? Icons.visibility_off_outlined
-                                : Icons.visibility_outlined,
-                            color: Colors.grey,
-                          ),
-                          onPressed: () => setState(
-                                  () => _obscurePassword = !_obscurePassword),
+                          icon: Icon(_obscurePassword
+                              ? Icons.visibility_off_outlined
+                              : Icons.visibility_outlined, color: Colors.grey),
+                          onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
                         ),
                       ),
-                      // FIX: added validation
-                      validator: (v) =>
-                      (v == null || v.isEmpty) ? 'Password is required' : null,
+                      validator: (v) => (v == null || v.isEmpty) ? 'Password is required' : null,
                     ),
                     const SizedBox(height: 28),
-
-                    // Login button
                     SizedBox(
                       height: 50,
                       child: ElevatedButton(
                         onPressed: _isLoading ? null : _login,
                         child: _isLoading
-                            ? const SizedBox(
-                          width: 22,
-                          height: 22,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2.5,
-                            color: Colors.white,
-                          ),
-                        )
+                            ? const SizedBox(width: 22, height: 22,
+                            child: CircularProgressIndicator(strokeWidth: 2.5, color: Colors.white))
                             : const Text('Login'),
                       ),
                     ),
                     const SizedBox(height: 16),
-
-                    // Sign up link
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text("Don't have an account?",
                             style: TextStyle(color: Colors.grey.shade600)),
                         TextButton(
-                          onPressed: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (_) => const SignUpPage()),
-                          ),
-                          child: const Text(
-                            'Sign Up',
-                            style: TextStyle(
-                              color: Color(0xFF1B5E20),
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
+                          onPressed: () => Navigator.push(context,
+                              MaterialPageRoute(builder: (_) => const SignUpPage())),
+                          child: const Text('Sign Up',
+                              style: TextStyle(color: Color(0xFF1B5E20),
+                                  fontWeight: FontWeight.w700)),
                         ),
                       ],
                     ),

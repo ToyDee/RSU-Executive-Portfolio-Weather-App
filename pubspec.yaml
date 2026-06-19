@@ -1,29 +1,25 @@
 name: finalassignment
-description: "A new Flutter project."
-# The following line prevents the package from being accidentally published to
-# pub.dev using `flutter pub publish`. This is preferred for private packages.
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+description: "RSU Executive Portfolio & Weather App"
+publish_to: 'none'
 
 version: 1.0.0+1
 
 environment:
   sdk: ^3.7.2
 
-
 dependencies:
   flutter:
     sdk: flutter
-
-
   cupertino_icons: ^1.0.8
+  shared_preferences: ^2.2.2
+  http: ^0.13.6
+  # NEW: needed for MD5 password hashing in app_security.dart
+  crypto: ^3.0.3
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  shared_preferences: ^2.2.2
-  http: ^0.13.6
   flutter_lints: ^5.0.0
-
 
 flutter:
   assets:
@@ -34,7 +30,7 @@ flutter:
     - Assets/Images/3.jpg
     - Assets/Images/4.jpg
     - Assets/Images/5.jpg
-    - assets/Data/employees.json
+    - Assets/Data/employees.json
     - Assets/Icons/cloud.png
     - Assets/Icons/sun.png
     - Assets/Icons/raining.png
